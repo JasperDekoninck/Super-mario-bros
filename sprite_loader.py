@@ -145,7 +145,7 @@ KOOPA_TURTLE = {
     ]
 }
 
-MARIO_STILL = mario.subsurface((818, 11, 14, 31))
+MARIO_STILL = mario.subsurface((697, 10, 15, 32))
 MARIO_DUCK = mario.subsurface((551, 106, 18, 18))
 MARIO_RUNNING = []
 
@@ -216,8 +216,8 @@ if __name__ == "__main__":
         if pressed[0]:
             print(pygame.mouse.get_pos())
 
-        screen.blit(koopatroopa_green.subsurface((0, 600, koopatroopa_blue.get_size()[0], koopatroopa_blue.get_size()[1] - 600)), (0, 0))
-        #pygame.draw.rect(screen, 255, (0, 0, 60, 100))
-        #screen.blit(pygame.transform.scale(MARIO_RUNNING[0], (60, 100)), (0, 0))
+        #screen.blit(mario, (0, 0))
+        pygame.draw.rect(screen, 255, (0, 0, 60, 100))
+        screen.blit(pygame.transform.scale(MARIO_STILL, (60, 100)), (0, 0))
 
         pygame.display.update()

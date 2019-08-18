@@ -110,8 +110,6 @@ class World:
         """
         Adds a game object to the correct list of game objects
         """
-        if not self.allowed_game_object(game_object):
-            raise ValueError("Invalid position for this game object.")
         game_object.world = self
         if game_object.type == "player":
             if self.player is None:
@@ -173,8 +171,10 @@ class World:
                 self.player.horizontal_move(direction=1)
             else:
                 self.player.horizontal_move(direction=0)
-            if keys[pygame.K_UP]:
+            if keys[pygame.K_UP] and not self.player.jumping:
                 self.player.jump()
+            elif not keys[pygame.K_UP] and self.player.jumping:
+                self.player.end_jump()
             if keys[pygame.K_DOWN]:
                 self.player.duck()
             else:

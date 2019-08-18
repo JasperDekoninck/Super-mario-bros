@@ -335,7 +335,8 @@ class ChangeScreen:
                 input_parameters = (pos,) + input_parameters[1:]
                 game_object = self.current_class[0](*input_parameters)
                 try:
-                    self.world.add_gameobject(game_object)
+                    if self.world.allowed_game_object(game_object):
+                        self.world.add_gameobject(game_object)
                     game_object.collision_all(self.world.get_all_game_objects_no_tiles(),
                                               self.world.tiles_fast_access)
                 except ValueError:  # you can't add an invalid object

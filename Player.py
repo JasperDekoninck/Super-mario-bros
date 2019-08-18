@@ -24,6 +24,7 @@ class Mario(GameObject):
         # The number of coins the player has taken
         self.coins = 0
         self.goal_reached = False
+        self.jumping = False
 
     def collision_reaction(self, side, other):
         if other.type != "goal":
@@ -45,6 +46,9 @@ class Mario(GameObject):
                         KICK_SOUND.play()
                 self.able_to_jump = True
                 self.jump()
+                # This makes sure that a full jump is performed, otherwise the program will call end_jump()
+                # and set te velocity back to 0
+                self.jumping = False
             elif self.hit <= 0:
                 self.set_lives(self.lives - 1)
                 self.hit = INVULNERABLE_TIME
@@ -96,10 +100,16 @@ class Mario(GameObject):
         self.ducking = False
 
     def jump(self):
-        if self.able_to_jump:
+        if self.able_to_jump and not self.jumping:
             self.able_to_jump = False
             self.vel[1] = - self.jump_speed
             self.change_sprite()
+            self.jumping = True
+
+    def end_jump(self):
+        if self.jumping:
+            self.vel[1] = np.maximum(0, self.vel[1])
+            self.jumping = False
 
     def horizontal_move(self, direction=0):
         self.vel[0] = direction * self.horizontal_speed

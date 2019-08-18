@@ -123,12 +123,18 @@ class GameObject(pygame.sprite.Sprite):
         Handles the reaction of a game object and the other game object to a collision.
         """
         if not self.passable and not other.passable:
-            if side == "down" or side == "up":
-                self.vel[1] = 0
-                other.vel[1] = 0
+            if side == "down":
+                self.vel[1] = np.minimum(self.vel[1], 0)
+                other.vel[1] = np.maximum(self.vel[1], 0)
+            elif side == "up":
+                self.vel[1] = np.maximum(self.vel[1], 0)
+                other.vel[1] = np.minimum(self.vel[1], 0)
+            elif side == "left":
+                self.vel[0] = np.maximum(self.vel[0], 0)
+                other.vel[0] = np.minimum(self.vel[0], 0)
             else:
-                self.vel[0] = 0
-                other.vel[0] = 0
+                self.vel[0] = np.minimum(self.vel[0], 0)
+                other.vel[0] = np.maximum(self.vel[0], 0)
 
             if side == "down":
                 self.collided_down = True
