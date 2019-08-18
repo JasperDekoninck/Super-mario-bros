@@ -14,4 +14,5 @@ Just follow the steps, when you're doing the actual creating, you can do the fol
 3. You can move the screen up / down / left / right by using the arrow keys.
 4. You can play your world in creation by pressing the escape key.
      If you press the key again, you stop playing.
+
 You can save your world by pressing enter.
