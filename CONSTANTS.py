@@ -10,7 +10,7 @@ mixer.init()
 # worlds in ways you probably don't want, so this is not advised)
 
 GRAVITY = 500
-FPS = 30
+FPS = 60
 SCREEN_SIZE = (1200, 600)
 TILE_SIZE = (15, 15)
 CAMERA_POS = (-100, -300)

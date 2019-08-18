@@ -68,7 +68,7 @@ class GameObject(pygame.sprite.Sprite):
         self.pos[0] += (old_size[0] - self.size[0])
 
     def render(self, screen, pos_camera, size_screen=SCREEN_SIZE):
-        position = self.pos.astype(np.int32) - pos_camera.astype(np.int32)
+        position = np.round(self.pos - pos_camera).astype(np.int32)
         if 0 <= position[0] + self.size[0] and position[0] <= size_screen[0] and \
                 0 <= position[1] + self.size[1] and position[1] <= size_screen[1]:
             screen.blit(self.image, position)

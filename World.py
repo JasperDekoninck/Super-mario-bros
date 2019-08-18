@@ -165,10 +165,6 @@ class World:
         if self.player is not None:
             self.player.collision_all(passive_collision_objects, self.tiles_fast_access)
             self.player.update(time)
-            # updates the camera position based on the position of the player
-            x_camera_pos = np.minimum(np.maximum(0, self.player.pos[0] + CAMERA_POS[0]), self.size[0] - SCREEN_SIZE[0])
-            y_camera_pos = np.minimum(np.maximum(0, self.player.pos[1] + CAMERA_POS[1]), self.size[1] - SCREEN_SIZE[1])
-            self.camera_pos = np.array([np.round(x_camera_pos), np.round(y_camera_pos)]).astype(np.int32)
 
         # updates all game objects according to in which list they are
         for i, game_object in enumerate(self.game_objects):
@@ -187,6 +183,14 @@ class World:
             new_passed_time = np.minimum(0.004, time - passed_time)
             self.one_update(new_passed_time)
             passed_time += new_passed_time
+
+        if self.player is not None:
+            # updates the camera position based on the position of the player
+            player_pos_x = self.player.pos[0] + self.player.size[0] // 2
+            player_pos_y = self.player.pos[1] + self.player.size[1] // 2
+            x_camera_pos = np.minimum(np.maximum(0, player_pos_x + CAMERA_POS[0]), self.size[0] - SCREEN_SIZE[0])
+            y_camera_pos = np.minimum(np.maximum(0, player_pos_y + CAMERA_POS[1]), self.size[1] - SCREEN_SIZE[1])
+            self.camera_pos = np.array([x_camera_pos, y_camera_pos])
 
     def save(self, file):
         """
