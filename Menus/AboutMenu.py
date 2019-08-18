@@ -1,4 +1,5 @@
 from CONSTANTS import *
+from Menus.Button import TextButton
 
 
 class AboutMenu:
@@ -24,18 +25,14 @@ class AboutMenu:
             "     If you press the key again, you stop playing.",
             "You can save your world by pressing enter."
         ]
-        self.texts = []
-        self.pos = []
+        self.buttons = []
         y_pos = 10
         for phrase in self.phrases:
-            text = FONT_STANDARD.render(phrase, True, pygame.Color("white"))
-            self.texts.append(text)
-            self.pos.append((10, y_pos))
-            y_pos += self.texts[-1].get_size()[1] + 2
+            self.buttons.append(TextButton((10, y_pos), phrase, FONT_STANDARD, pygame.Color("white")))
+            y_pos += self.buttons[-1].size[1] + 2
 
-        self.main_text = FONT_BIG.render("Main Menu", True, pygame.Color("White"))
-        self.size_main = self.main_text.get_size()
-        self.pos_main = (10, y_pos + self.texts[-1].get_size()[1] + 10)
+        pos_main = (10, y_pos + self.buttons[-1].size[1] + 10)
+        self.main_button = TextButton(pos_main, "Main menu", FONT_BIG, pygame.Color("white"), pygame.Color("red"))
 
         # A variable registering how long the user has been in the menu. Not allowing anything to happen before
         # this variable gets to a certain size, makes sure it is not possible to accidently click and go two menus
@@ -44,14 +41,9 @@ class AboutMenu:
         self.clock = pygame.time.Clock()
 
     def render(self):
-        for pos, text in zip(self.pos, self.texts):
-            self.screen.blit(text, pos)
-
-        self.screen.blit(self.main_text, self.pos_main)
-
-    def mouse_on_button(self, pos_mouse, pos_button, size_button):
-        return pos_button[0] <= pos_mouse[0] <= pos_button[0] + size_button[0] and \
-               pos_button[1] <= pos_mouse[1] <= pos_button[1] + size_button[1]
+        for button in self.buttons:
+            button.render(self.screen)
+        self.main_button.render(self.screen)
 
     def loop(self):
         self.time_after_creation = 0
@@ -63,9 +55,10 @@ class AboutMenu:
                     quit()
 
             mouse_buttons = pygame.mouse.get_pressed()
+            pos = pygame.mouse.get_pos()
+            self.main_button.update_selected(pos)
             if mouse_buttons[0] and self.time_after_creation > 0.1:
-                pos = pygame.mouse.get_pos()
-                if self.mouse_on_button(pos, self.pos_main, self.size_main):
+                if self.main_button.selected:
                     return "main"
 
             self.render()

@@ -24,6 +24,20 @@ class GameOverMenu:
         self.play_button.render(self.screen)
         self.main_button.render(self.screen)
 
+    def mouse_update(self):
+        mouse_buttons = pygame.mouse.get_pressed()
+        pos = pygame.mouse.get_pos()
+
+        self.play_button.update_selected(pos)
+        self.main_button.update_selected(pos)
+        if mouse_buttons[0] and self.time_after_creation > 0.1:
+            if self.play_button.selected:
+                return "level"
+            elif self.main_button.selected:
+                return "main"
+
+        return None
+
     def loop(self, world):
         self.time_after_creation = 0
         if not world.won:
@@ -33,15 +47,10 @@ class GameOverMenu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     quit()
-            mouse_buttons = pygame.mouse.get_pressed()
-            pos = pygame.mouse.get_pos()
-            self.play_button.update_selected(pos)
-            self.main_button.update_selected(pos)
-            if mouse_buttons[0] and self.time_after_creation > 0.1:
-                if self.play_button.selected:
-                    return "level"
-                elif self.main_button.selected:
-                    return "main"
+
+            selected_menu = self.mouse_update()
+            if selected_menu is not None:
+                return selected_menu
 
             get_fps = self.clock.get_fps()
             if get_fps != 0:

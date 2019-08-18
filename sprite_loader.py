@@ -32,8 +32,8 @@ BACKGROUNDS = {
 }
 
 for i in range(18):
-    pos = ((i % 9) * SIZE_BACKGROUND1[0] + 10, (i // 9)* SIZE_BACKGROUND1[1] + 10)
-    BACKGROUNDS["Castle" + str(i)] = background_images3.subsurface(pos + (SIZE_BACKGROUND1[0] - 12, SIZE_BACKGROUND1[1] - 12))
+    pos_ = ((i % 9) * SIZE_BACKGROUND1[0] + 10, (i // 9)* SIZE_BACKGROUND1[1] + 10)
+    BACKGROUNDS["Castle" + str(i)] = background_images3.subsurface(pos_ + (SIZE_BACKGROUND1[0] - 12, SIZE_BACKGROUND1[1] - 12))
 
 all = pygame.image.load(os.path.join(SPRITE_PATH, "all.png"))
 tiles = pygame.image.load(os.path.join(SPRITE_PATH, "tiles transparent.png"))

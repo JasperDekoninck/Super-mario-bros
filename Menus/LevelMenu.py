@@ -32,10 +32,6 @@ class LevelMenu:
                 x_pos = 10
                 y_pos = y_pos + self.buttons[-1].size[1] + 10
 
-    def mouse_on_button(self, pos_mouse, pos_button, size_button):
-        return pos_button[0] <= pos_mouse[0] <= pos_button[0] + size_button[0] and \
-               pos_button[1] <= pos_mouse[1] <= pos_button[1] + size_button[1]
-
     def render(self):
         for button in self.buttons:
             button.render(self.screen)

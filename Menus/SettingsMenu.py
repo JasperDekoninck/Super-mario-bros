@@ -68,6 +68,17 @@ class SettingsMenu:
             for button in self.options[option_name]:
                 button.render(self.screen)
 
+    def update_options(self):
+        pos = pygame.mouse.get_pos()
+        for option in self.options:
+            for button in self.options[option][1:]:
+                if button.is_selected(pos) and not button.selected:
+                    for button2 in self.options[option][1:]:
+                        button2.selected = False
+                    button.selected = True
+                    SettingsMenu.SETTINGS[option] = button.message
+                self.save_options()
+
     def loop(self):
         self.time_after_creation = 0
         while True:
@@ -80,16 +91,7 @@ class SettingsMenu:
             pos = pygame.mouse.get_pos()
             self.main_button.update_selected(pos)
             if mouse_buttons[0] and self.time_after_creation > 0.1:
-                pos = pygame.mouse.get_pos()
-                # Check whether settings must be changed or not
-                for option in self.options:
-                    for button in self.options[option][1:]:
-                        if button.is_selected(pos) and not button.selected:
-                            for button2 in self.options[option][1:]:
-                                button2.selected = False
-                            button.selected = True
-                            SettingsMenu.SETTINGS[option] = button.message
-                        self.save_options()
+                self.update_options()
 
                 if self.main_button.selected:
                     return "main"

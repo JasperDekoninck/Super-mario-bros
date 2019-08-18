@@ -61,3 +61,9 @@ class TextButton(Button):
         self.set_content(new_content)
         if self.color_selected is not None:
             self.hover_over_content = self.font.render(new_text, True, self.color_selected)
+
+
+class ImageButton(Button):
+    def __init__(self, pos, content, description):
+        super(ImageButton, self).__init__(pos, content)
+        self.description = description

@@ -53,6 +53,16 @@ class World:
         return game_objects + self.game_objects + self.change_passive_collides + self.change_dont_collide + \
                self.background_objects + self.dont_change_passive_collide + self.tiles
 
+    def get_all_game_objects_no_tiles(self):
+        """
+        gets all game objects excluding tiles and background images
+        """
+        game_objects = []
+        if self.player is not None:
+            game_objects = [self.player]
+        return game_objects + self.game_objects + self.change_passive_collides + self.change_dont_collide + \
+               self.dont_change_passive_collide
+
     def render_tiles_and_basic(self, screen, size, camera_pos=np.zeros(2)):
         """
         This function renders the tiles, background, background objects and objects that dont change but do collide
@@ -88,15 +98,26 @@ class World:
         if self.player is not None:
             self.player.render(screen, self.camera_pos)
 
+    def allowed_game_object(self, game_object):
+        if game_object.type == "tile" or game_object.passable:
+            return True
+        for game_object2 in self.get_all_game_objects_no_tiles():
+            if game_object.collides_fast_check(game_object2):
+                return False
+        return True
+
     def add_gameobject(self, game_object):
         """
         Adds a game object to the correct list of game objects
         """
+        if not self.allowed_game_object(game_object):
+            raise ValueError("Invalid position for this game object.")
         game_object.world = self
         if game_object.type == "player":
             if self.player is None:
                 self.player = game_object
             else:
+                game_object.world = None
                 raise ValueError("World already has a player.")
         elif game_object.type == "tile":
             self.tiles.append(game_object)

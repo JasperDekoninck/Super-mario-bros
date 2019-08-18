@@ -5,7 +5,7 @@ from World import World
 from Menus.LevelMenu import LevelMenu
 from Menus.PlayMenu import PlayMenu
 from Specials import *
-from Menus.Button import Button, TextButton
+from Menus.Button import ImageButton, TextButton
 
 
 class QuestionScreen:
@@ -21,9 +21,8 @@ class QuestionScreen:
         self.time_after_creation = 0
         self.clock = pygame.time.Clock()
 
-        self.question = FONT_MINI.render(question, True, pygame.Color("White"))
-        self.size_question = self.question.get_size()
-        self.pos_question = (SCREEN_SIZE[0] // 2 - self.size_question[0] // 2, SCREEN_SIZE[1] // 3)
+        pos_question = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 3)
+        self.question_button = TextButton(pos_question, question, FONT_SMALL, pygame.Color("white"), center_pos=True)
         self.answer1_button = None
         self.answer2_button = None
         self.answer_button = None
@@ -38,12 +37,8 @@ class QuestionScreen:
             pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 3 + 50)
             self.answer_button = TextButton(pos, "", FONT_BIG, pygame.Color("white"), center_pos=True)
 
-    def mouse_on_button(self, pos_mouse, pos_button, size_button):
-        return pos_button[0] <= pos_mouse[0] <= pos_button[0] + size_button[0] and \
-               pos_button[1] <= pos_mouse[1] <= pos_button[1] + size_button[1]
-
     def render(self):
-        self.screen.blit(self.question, self.pos_question)
+        self.question_button.render(self.screen)
         if self.answer_button is not None:
             self.answer_button.render(self.screen)
         else:
@@ -62,6 +57,20 @@ class QuestionScreen:
 
         return None
 
+    def mouse_update(self):
+        mouse_buttons = pygame.mouse.get_pressed()
+        pos = pygame.mouse.get_pos()
+        if self.answer1_button is not None:
+            self.answer1_button.update_selected(pos)
+            self.answer2_button.update_selected(pos)
+        if mouse_buttons[0] and self.time_after_creation > 0.1 and self.answer1_button is not None:
+            if self.answer1_button.selected:
+                return self.answer1_button.message
+            elif self.answer2_button.selected:
+                return self.answer2_button.message
+
+        return None
+
     def loop(self):
         self.time_after_creation = 0
         while True:
@@ -74,16 +83,9 @@ class QuestionScreen:
                 if answer is not None:
                     return answer
 
-            mouse_buttons = pygame.mouse.get_pressed()
-            pos = pygame.mouse.get_pos()
-            if self.answer1_button is not None:
-                self.answer1_button.update_selected(pos)
-                self.answer2_button.update_selected(pos)
-            if mouse_buttons[0] and self.time_after_creation > 0.1 and self.answer1_button is not None:
-                if self.answer1_button.selected:
-                    return self.answer1_button.message
-                elif self.answer2_button.selected:
-                    return self.answer2_button.message
+            selected_answer = self.mouse_update()
+            if selected_answer is not None:
+                return selected_answer
 
             get_fps = self.clock.get_fps()
             if get_fps != 0:
@@ -104,34 +106,34 @@ class BackgroundSelectScreen:
         # further
         self.time_after_creation = 0
         self.clock = pygame.time.Clock()
-        self.question = FONT_MEDIUM.render("What background do you want?", True, pygame.Color("White"))
-        self.size_question = self.question.get_size()
-        self.pos_question = (SCREEN_SIZE[0] // 2 - self.size_question[0] // 2, 10)
+        self.question_button = TextButton((SCREEN_SIZE[0] // 2, 10), "What background do you want?", FONT_MEDIUM,
+                                          pygame.Color("white"), center_pos=True)
         self.n_backgrounds = len(BACKGROUNDS)
         self.n_backgrounds_row = 4
         self.start_first_row = 100
         self.camera_pos = np.zeros(2)
-
-        self.background_size = (SCREEN_SIZE[0] // self.n_backgrounds_row - 10, SCREEN_SIZE[0] // self.n_backgrounds_row - 10)
-        self.backgrounds = [pygame.transform.scale(background, self.background_size) for background in BACKGROUNDS.values()]
-        self.positions_backgrounds = [
-            (self.background_size[0] * (i % 4), self.background_size[1] * (i // 4) + self.start_first_row)
-            for i in range(len(BACKGROUNDS))
-        ]
+        self.background_buttons = []
+        self.background_size = 2 * (SCREEN_SIZE[0] // self.n_backgrounds_row - 3,)
+        for i, background in enumerate(BACKGROUNDS):
+            pos = ((self.background_size[0] + 3) * (i % self.n_backgrounds_row),
+                   (self.background_size[1] + 3) * (i // self.n_backgrounds_row) + self.start_first_row)
+            image = pygame.transform.scale(BACKGROUNDS[background], self.background_size)
+            self.background_buttons.append(ImageButton(pos, image, background))
 
     def render(self):
-        self.screen.blit(self.question, self.pos_question - self.camera_pos)
-        for pos, background in zip(self.positions_backgrounds, self.backgrounds):
-            self.screen.blit(background, pos - self.camera_pos)
+        self.question_button.render(self.screen, self.camera_pos)
+        for button in self.background_buttons:
+            button.render(self.screen, self.camera_pos)
 
     def handle_mouse(self):
         mouse_buttons = pygame.mouse.get_pressed()
+        pos = pygame.mouse.get_pos() + self.camera_pos
+        for button in self.background_buttons:
+            button.update_selected(pos)
         if mouse_buttons[0] and self.time_after_creation > 0.1:
-            pos = pygame.mouse.get_pos() + self.camera_pos
-            background_pos = [pos[0].astype(np.int32) // self.background_size[0],
-                              (pos[1] - self.start_first_row).astype(np.int32) // self.background_size[1]]
-            selected_background = self.n_backgrounds_row * background_pos[1] + background_pos[0]
-            return list(BACKGROUNDS.keys())[selected_background]
+            for button in self.background_buttons:
+                if button.selected:
+                    return button.description
         return None
 
     def loop(self):
@@ -182,6 +184,8 @@ class ChangeScreen:
         # Once the user selects a class, the current class will be stored in this variable, as soon
         # as the user once again clicks, an instance will be created
         self.current_class = None
+
+        # The two arrows for changing tabs
         self.arrow1_pos = (self.pos_information[0] + self.size_information[0] // 2 - 20, 10)
         self.arrow1_size = (20, 20)
         self.points_arrow1 = [
@@ -203,14 +207,16 @@ class ChangeScreen:
             MysteryBox((35, 45), color="red", autoset=False),
             MysteryBox((55, 45), color="blue", autoset=False),
         ]
+
+        # adding all tiles
         x_pos = 75
         y_pos = 45
         for tilename in TILES:
             self.tiles.append(NormalTile((x_pos, y_pos), tilename, autoset=False))
-            x_pos += 20
-            if x_pos + 20 >= self.size_information[0]:
-                x_pos = 15
-                y_pos += 20
+            x_pos += TILE_SIZE[0] + 5
+            if x_pos + TILE_SIZE[0] + 5 >= self.size_information[0]:
+                x_pos = TILE_SIZE[0]
+                y_pos += TILE_SIZE[0] + 5
 
         # Loading all enemies and players
         self.enemies_and_player = [
@@ -277,19 +283,14 @@ class ChangeScreen:
         self.play_screen = PlayMenu(self.screen)
 
     def render_grid(self):
-        """
-        renders the gridlines such that it easier to see for the player what he / she is doing
-        :return:
-        """
+        """renders the gridlines such that it easier to see for the player what he / she is doing"""
         for i in range(-self.world.camera_pos[0].astype(np.int32) % TILE_SIZE[0], self.pos_information[0], TILE_SIZE[0]):
             pygame.draw.line(self.screen, pygame.Color("black"), (i, 0), (i, SCREEN_SIZE[1]))
         for j in range(-self.world.camera_pos[1].astype(np.int32) % TILE_SIZE[1], SCREEN_SIZE[1], TILE_SIZE[1]):
             pygame.draw.line(self.screen, pygame.Color("black"), (0, j), (self.pos_information[0], j))
 
     def render(self):
-        """
-        Renders the screen, including the grid, the world and the sidebar information with its game objects
-        """
+        """Renders the screen, including the grid, the world and the sidebar information with its game objects"""
         self.world.render(self.screen, fast=False)
         self.render_grid()
         pygame.draw.rect(self.screen, pygame.Color("grey"), self.pos_information + self.size_information)
@@ -312,6 +313,34 @@ class ChangeScreen:
 
         return None
 
+    def tab_change(self):
+        # Changing tabs if player clicks on arrows
+        pos = pygame.mouse.get_pos()
+        if self.mouse_on_button(pos, self.arrow1_pos, self.arrow1_size) and \
+                self.time_since_selected_new_tab > 0.1:
+            self.tab = (self.tab - 1) % len(self.tabs)
+            self.time_since_selected_new_tab = 0
+        elif self.mouse_on_button(pos, self.arrow2_pos, self.arrow2_size) and \
+                self.time_since_selected_new_tab > 0.1:
+            self.time_since_selected_new_tab = 0
+            self.tab = (self.tab + 1) % len(self.tabs)
+
+    def create_new_gameobject(self):
+        pos = pygame.mouse.get_pos()
+        if pos[0] < self.pos_information[0]:  # only allowing new creations if the mouse is in the world
+            # and not on the sidebar
+            pos = np.array(pos).astype(np.int32) + self.world.camera_pos
+            if self.game_object_at_pos(pos) is None and self.current_class is not None:
+                input_parameters = self.current_class[1]
+                input_parameters = (pos,) + input_parameters[1:]
+                game_object = self.current_class[0](*input_parameters)
+                try:
+                    self.world.add_gameobject(game_object)
+                    game_object.collision_all(self.world.get_all_game_objects_no_tiles(),
+                                              self.world.tiles_fast_access)
+                except ValueError:  # you can't add an invalid object
+                    pass
+
     def handle_mouse(self):
         """
         Handles the clicks of the mouse
@@ -323,26 +352,8 @@ class ChangeScreen:
                 if self.mouse_on_button(pos, game_object.pos - self.camera_pos, game_object.size):
                     self.current_class = (game_object.__class__, game_object.input_parameters)
 
-            if self.mouse_on_button(pos, self.arrow1_pos, self.arrow1_size) and \
-                    self.time_since_selected_new_tab > 0.1:
-                self.tab = (self.tab - 1) % len(self.tabs)
-                self.time_since_selected_new_tab = 0
-            elif self.mouse_on_button(pos, self.arrow2_pos, self.arrow2_size) and \
-                    self.time_since_selected_new_tab > 0.1:
-                self.time_since_selected_new_tab = 0
-                self.tab = (self.tab + 1) % len(self.tabs)
-
-            if pos[0] < self.pos_information[0]:  # only allowing new creations if the mouse is in the world
-                # and not on the sidebar
-                pos = np.array(pos).astype(np.int32) + self.world.camera_pos
-                if self.game_object_at_pos(pos) is None and self.current_class is not None:
-                    input_parameters = self.current_class[1]
-                    input_parameters = (pos,) + input_parameters[1:]
-                    game_object = self.current_class[0](*input_parameters)
-                    try:
-                        self.world.add_gameobject(game_object)
-                    except ValueError:  # you can't add an invalid object
-                        pass
+            self.tab_change()
+            self.create_new_gameobject()
 
         # deleting a game object at the given position
         elif mouse_buttons[2] and self.time_after_creation > 0.1:
