@@ -97,7 +97,7 @@ class World:
         if game_object.type == "tile" or game_object.passable:
             return True
         for game_object2 in self.get_all_game_objects_no_tiles():
-            if game_object.collides_fast_check(game_object2):
+            if game_object.collides(game_object2):
                 return False
         return True
 
