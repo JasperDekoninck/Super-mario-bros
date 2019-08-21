@@ -6,7 +6,7 @@ class PlayMenu:
         self.screen = screen
         self.clock = pygame.time.Clock()
 
-    def loop(self, world):
+    def loop(self, world, file=None):
         while True:
             self.clock.tick(FPS)
             for event in pygame.event.get():
@@ -23,11 +23,17 @@ class PlayMenu:
             world.render(self.screen)
 
             if world.gameover:
+                if file is not None:
+                    world.save_top_score(file)
                 return "game over"
 
             text = FONT_MEDIUM.render("FPS: " + str(round(get_fps, 2)), True, pygame.Color('white'))
             self.screen.blit(text, (10, 10))
             if world.player is not None:
                 coins_total = FONT_MEDIUM.render("Coins: " + str(world.player.coins), True, pygame.Color('white'))
+                score_total = FONT_MEDIUM.render("Score: " + str(world.player.score), True, pygame.Color('white'))
+                top_score = FONT_MEDIUM.render("Top Score: " + str(world.top_score), True, pygame.Color('white'))
                 self.screen.blit(coins_total, (10, 50))
+                self.screen.blit(score_total, (10, 90))
+                self.screen.blit(top_score, (10, 130))
             pygame.display.update()

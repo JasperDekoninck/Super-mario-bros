@@ -18,6 +18,7 @@ class Mario(GameObject):
         self.direction = 1
         self.time_since_sprite_change = 0
         self.basic_size = np.copy(self.size)
+        self.score = 0
 
         # keeps time after a hit, the player is invulnerable while self.hit > 0
         self.hit = 0
@@ -36,6 +37,7 @@ class Mario(GameObject):
                     (str(other) != "turtle" or other.vel[0] == 0):
                 if str(other) != "turtle":
                     other.set_lives(other.lives - 1)
+                    self.score += 100
                 if SettingsMenu.SETTINGS["Sound"] == "on":
                     KICK_SOUND.play()
                 self.able_to_jump = True
@@ -48,6 +50,7 @@ class Mario(GameObject):
                 self.hit = INVULNERABLE_TIME
         elif other.type == "goal":
             if not self.goal_reached and self.pos[0] >= other.pos[0] + 4 * other.size[0] // 7:
+                self.score += 1000
                 self.goal_reached = True
                 self.world.won = True
                 self.current_sprite_int = 0

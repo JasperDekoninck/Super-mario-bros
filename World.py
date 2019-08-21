@@ -20,12 +20,15 @@ class World:
             self.background_image = pygame.transform.scale(self.background_image, self.background_size)
             self.tiles_fast_access = [[None for _ in range(self.size[1] // TILE_SIZE[1] + 1)]
                                       for _ in range(self.size[0] // TILE_SIZE[0] + 1)]
+            self.save_list = None
+            self.top_score = 0
 
         # All objects in different places, this is for speed
         self.player = None
         self.game_objects = []
         self.tiles = []
         self.background_objects = []
+        self.top_score = 0
 
         # on the surface, the background (with tiles etc.) will be blitted. This speeds up the entire thing
         # a lot.
@@ -175,7 +178,7 @@ class World:
         passed_time = 0
         while time > passed_time:
             # Not allowing the update to be too high, because the game would glitch if this happened
-            new_passed_time = np.minimum(0.02, time - passed_time)
+            new_passed_time = np.minimum(0.04, time - passed_time)
             self.one_update(new_passed_time)
             passed_time += new_passed_time
 
@@ -187,11 +190,22 @@ class World:
             y_camera_pos = np.minimum(np.maximum(0, player_pos_y + CAMERA_POS[1]), self.size[1] - SCREEN_SIZE[1])
             self.camera_pos = np.array([x_camera_pos, y_camera_pos])
 
+            if self.gameover:
+                if self.player.score > self.top_score:
+                    self.top_score = self.player.score
+
+    def save_top_score(self, file):
+        """
+        Saves the initial state of the world to the given file.
+        """
+        self.save_list[2] = self.top_score
+        pickle.dump(self.save_list, open(file, "wb"))
+
     def save(self, file):
         """
         Saves the world to the given file.
         """
-        save_list = [self.size, self.string_background_image]
+        save_list = [self.size, self.string_background_image, 0]
         game_objects = self.get_all_game_objects()
 
         for game_object in game_objects:
@@ -204,7 +218,7 @@ class World:
         Loads the world from the given file
         """
         save_list = pickle.load(open(file, "rb"))
-
+        self.save_list = save_list
         self.camera_pos = np.zeros(2)
         self.gameover = False
         self.won = False
@@ -225,8 +239,8 @@ class World:
         factor = self.size[1] / self.background_size[1]
         self.background_size = (int(self.background_size[0] * factor), self.size[1])
         self.background_image = pygame.transform.scale(self.background_image, self.background_size)
-
+        self.top_score = save_list[2]
         # loads all game objects
-        for element in save_list[2:]:
+        for element in save_list[3:]:
             game_object = element[0](*element[1])
             self.add_gameobject(game_object)

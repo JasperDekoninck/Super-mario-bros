@@ -102,6 +102,7 @@ class Coin(GameObject):
     def special_reaction_collision(self, side, other):
         if other.type == "player":
             other.coins += 1
+            other.score += 100
             self.world.remove_gameobject(self)
             if SettingsMenu.SETTINGS["Sound"] == "on":
                 COIN_SOUND.play()

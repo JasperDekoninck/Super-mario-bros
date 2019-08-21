@@ -32,9 +32,9 @@ def main():
         if current_menu == "main":
             current_menu = main_menu.loop()
         elif current_menu == "level":
-            current_menu, world, _ = level_menu.loop()
+            current_menu, world, path = level_menu.loop()
         elif current_menu == "play":
-            current_menu = play_menu.loop(world)
+            current_menu = play_menu.loop(world, path)
         elif current_menu == "game over":
             current_menu = game_over_menu.loop(world)
         elif current_menu == "creator":
