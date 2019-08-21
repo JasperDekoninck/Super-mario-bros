@@ -339,6 +339,7 @@ class ChangeScreen:
                         self.world.add_gameobject(game_object)
                         game_object.check_collision_update("vertical")
                         game_object.check_collision_update("horizontal")
+                        game_object.input_parameters = (game_object.pos,) + game_object.input_parameters[1:]
                 except ValueError:  # you can't add an invalid object
                     pass
 
