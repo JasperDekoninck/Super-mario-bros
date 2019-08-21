@@ -90,7 +90,7 @@ class GameObject(pygame.sprite.Sprite):
                            int(np.ceil(self.pos[1] + self.size[1])), TILE_SIZE[1]):
                 try:
                     tile = self.world.tiles_fast_access[i // TILE_SIZE[0]][j // TILE_SIZE[1]]
-                    if tile is not None and self.collides(tile):
+                    if tile is not None and self.collides(tile) and tile != self:
                         return tile
                 except IndexError:
                     pass
