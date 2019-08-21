@@ -23,7 +23,7 @@ class Mushroom(GameObject):
         elif other.type == "enemy":
             self.world.remove_gameobject(self)
         else:
-            if side == "left" or side == "right":
+            if side == "horizontal" and not other.passable:
                 self.direction *= -1
                 self.vel[0] = self.direction * self.speed
 
@@ -33,11 +33,6 @@ class Flagpole(GameObject):
         self.input_parameters = (pos, size)
         super(Flagpole, self).__init__(pos, np.zeros(2), FLAGPOLE, resize=size, world=world, type="goal",
                                        vertical_movable=False, horizontal_movable=False)
-
-    def collision_reaction(self, side, other):
-        if other.type != "player":
-            super(Flagpole, self).collision_reaction(side, other)
-        self.handle_special_reaction(side, other)
 
     def special_reaction_collision(self, side, other):
         if other.type == "player":

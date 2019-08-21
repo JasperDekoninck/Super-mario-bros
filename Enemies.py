@@ -22,12 +22,9 @@ class Enemy(GameObject):
         super(Enemy, self).__init__(pos, np.array([dir * SPEED_ENEMY, 0]), sprite, world=world, type="enemy")
 
     def special_reaction_collision(self, side, other):
-        if side == "left" and not other.passable:
-            self.vel[0] = self.speed
-            self.direction = 1
-        elif side == "right" and not other.passable:
-            self.vel[0] = - self.speed
-            self.direction = -1
+        if side == "horizontal" and not other.passable:
+            self.direction *= -1
+            self.vel[0] = self.speed * self.direction
 
     def handle_outside_world_size(self):
         super(Enemy, self).handle_outside_world_size()

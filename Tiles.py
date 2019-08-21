@@ -10,7 +10,7 @@ class Tile(GameObject):
         if autoset:
             pos = np.array([pos[0] - pos[0] % TILE_SIZE[0], pos[1] - pos[1] % TILE_SIZE[1]])
         super(Tile, self).__init__(pos, np.zeros(2), sprite, world=world, type="tile", horizontal_movable=False,
-                                   vertical_movable=False)
+                                   vertical_movable=False, resize=TILE_SIZE)
 
 
 class MysteryBox(Tile):
@@ -25,12 +25,12 @@ class MysteryBox(Tile):
     def special_reaction_collision(self, side, other):
         # when hit by the player in a certain way, a Mushroom will pop out and the object will be changed
         # into a Solid with the appropriate color
-        if (side == "down" and other.type == "player") or (side == "up" and other.type == "player" and other.ducking):
+        if side == "vertical" and other.type == "player" and (other.ducking or self.pos[1] < other.pos[1]):
             color_solid = self.color
             if self.color == "yellow":
                 color_solid = "brown"
             solid = NormalTile(self.pos, sprite_name=color_solid + " solid", world=None)
-            if side == "down":
+            if self.pos[1] < other.pos[1]:
                 mushroom = Mushroom((self.pos[0], self.pos[1] - TILE_SIZE[1] - 1), color=np.random.choice(["red", "blue"]),
                                      direction=np.random.choice([1, -1]))
             else:

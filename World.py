@@ -26,9 +26,6 @@ class World:
         self.game_objects = []
         self.tiles = []
         self.background_objects = []
-        self.change_dont_collide = []
-        self.change_passive_collides = []
-        self.dont_change_passive_collide = []
 
         # on the surface, the background (with tiles etc.) will be blitted. This speeds up the entire thing
         # a lot.
@@ -50,8 +47,7 @@ class World:
         game_objects = []
         if self.player is not None:
             game_objects = [self.player]
-        return game_objects + self.game_objects + self.change_passive_collides + self.change_dont_collide + \
-               self.background_objects + self.dont_change_passive_collide + self.tiles
+        return game_objects + self.game_objects + self.background_objects + self.tiles
 
     def get_all_game_objects_no_tiles(self):
         """
@@ -60,8 +56,7 @@ class World:
         game_objects = []
         if self.player is not None:
             game_objects = [self.player]
-        return game_objects + self.game_objects + self.change_passive_collides + self.change_dont_collide + \
-               self.dont_change_passive_collide
+        return game_objects + self.game_objects
 
     def render_tiles_and_basic(self, screen, size, camera_pos=np.zeros(2)):
         """
@@ -73,7 +68,7 @@ class World:
             screen.blit(self.background_image, pos)
         for tile in self.tiles:
             tile.render(screen, camera_pos, size)
-        for game_object in self.background_objects + self.dont_change_passive_collide:
+        for game_object in self.background_objects:
             game_object.render(screen, camera_pos, size)
 
     def render(self, screen, fast=True):
@@ -93,7 +88,7 @@ class World:
         else:
             self.render_tiles_and_basic(screen, SCREEN_SIZE, camera_pos=self.camera_pos)
 
-        for game_object in self.change_dont_collide + self.change_passive_collides + self.game_objects:
+        for game_object in  self.game_objects:
             game_object.render(screen, self.camera_pos)
         if self.player is not None:
             self.player.render(screen, self.camera_pos)
@@ -125,12 +120,6 @@ class World:
                 self.surface.blit(game_object.image, pos)
         elif game_object.type == "background":
             self.background_objects.append(game_object)
-        elif game_object.type == "change dont collide":
-            self.change_dont_collide.append(game_object)
-        elif game_object.type == "change passive collide":
-            self.change_passive_collides.append(game_object)
-        elif game_object.type == "dont change passive collide":
-            self.dont_change_passive_collide.append(game_object)
         else:
             self.game_objects.append(game_object)
 
@@ -150,12 +139,6 @@ class World:
             self.tiles_fast_access[pos[0] // TILE_SIZE[0]][pos[1] // TILE_SIZE[1]] = None
         elif game_object.type == "background":
             self.background_objects.remove(game_object)
-        elif game_object.type == "change dont collide":
-            self.change_dont_collide.remove(game_object)
-        elif game_object.type == "change passive collide":
-            self.change_passive_collides.remove(game_object)
-        elif game_object.type == "dont change passive collide":
-            self.dont_change_passive_collide.remove(game_object)
         else:
             self.game_objects.remove(game_object)
 
@@ -182,26 +165,17 @@ class World:
 
     def one_update(self, time):
         self.update_handle_keys()
-        passive_collision_objects = self.game_objects + self.change_passive_collides + self.dont_change_passive_collide
         if self.player is not None:
-            self.player.collision_all(passive_collision_objects, self.tiles_fast_access)
             self.player.update(time)
 
-        # updates all game objects according to in which list they are
-        for i, game_object in enumerate(self.game_objects):
-            # the i + 1: you don't need to check whether a game object with a previous game object, because this
-            # was already checked before
-            game_object.collision_all(passive_collision_objects[i + 1:], self.tiles_fast_access)
-            game_object.update(time)
-
-        for game_object in self.change_passive_collides + self.change_dont_collide:
+        for game_object in self.game_objects:
             game_object.update(time)
 
     def update(self, time):
         passed_time = 0
         while time > passed_time:
             # Not allowing the update to be too high, because the game would glitch if this happened
-            new_passed_time = np.minimum(0.004, time - passed_time)
+            new_passed_time = np.minimum(0.02, time - passed_time)
             self.one_update(new_passed_time)
             passed_time += new_passed_time
 

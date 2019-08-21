@@ -26,24 +26,18 @@ class Mario(GameObject):
         self.goal_reached = False
         self.jumping = False
 
-    def collision_reaction(self, side, other):
-        if other.type != "goal":
-            super(Mario, self).collision_reaction(side, other)
-        else:   # the goal aka "the flagpole", is hit: when this happens, some additional stuff needs to happen,
-                # such as saying that you won and changing the sprites
-            self.handle_special_reaction(side, other)
-            if not self.goal_reached and self.pos[0] >= other.pos[0] + 4 * other.size[0] // 7:
-                self.goal_reached = True
-                self.world.won = True
-                self.current_sprite_int = 0
+    def collision_set_good(self, collision_object, side_index):
+        if collision_object.type != "goal":
+            super(Mario, self).collision_set_good(collision_object, side_index)
 
     def special_reaction_collision(self, side, other):
         if other.type == "enemy" and other.alive:
-            if side == "down" and self.ducking:
+            if side == "vertical" and self.pos[1] < other.pos[1] and self.ducking and \
+                    (str(other) != "turtle" or other.vel[0] == 0):
                 if str(other) != "turtle":
                     other.set_lives(other.lives - 1)
-                    if SettingsMenu.SETTINGS["Sound"] == "on":
-                        KICK_SOUND.play()
+                if SettingsMenu.SETTINGS["Sound"] == "on":
+                    KICK_SOUND.play()
                 self.able_to_jump = True
                 self.jump()
                 # This makes sure that a full jump is performed, otherwise the program will call end_jump()
@@ -52,8 +46,12 @@ class Mario(GameObject):
             elif self.hit <= 0:
                 self.set_lives(self.lives - 1)
                 self.hit = INVULNERABLE_TIME
-
-        elif side == "down" and not other.passable:
+        elif other.type == "goal":
+            if not self.goal_reached and self.pos[0] >= other.pos[0] + 4 * other.size[0] // 7:
+                self.goal_reached = True
+                self.world.won = True
+                self.current_sprite_int = 0
+        elif side == "vertical" and not other.passable and self.pos[1] < other.pos[1]:
             self.able_to_jump = True
 
     def change_sprite(self):
@@ -120,7 +118,6 @@ class Mario(GameObject):
                 self.current_sprite_int = 0
         else:
             self.time_since_sprite_change = 0
-
         self.change_sprite()
 
     def on_death(self):
@@ -130,17 +127,21 @@ class Mario(GameObject):
             DIE_SOUND.play()
 
     def update(self, time):
-        self.pos[0] += time * self.vel[0]
-        if not self.goal_reached:
-            self.pos[1] += time * self.vel[1]
-            if not self.collided_down:
-                self.vel[1] += GRAVITY * time
-        else:
-            self.pos[1] += time * SPEED_DOWN_FLAGPOLE
-        self.collided_down = False
-        self.handle_outside_world_size()
-        self.change_sprite()
-        self.time_since_sprite_change += time
+        if self.vertical_movable:
+            if not self.goal_reached:
+                self.pos[1] += time * self.vel[1]
+            else:
+                self.pos[1] += time * SPEED_DOWN_FLAGPOLE
+
+            self.check_collision_update("vertical")
+            self.able_to_jump = self.vel[1] == 0
+            self.vel[1] += GRAVITY * time
+        if self.horizontal_movable:
+            self.pos[0] += time * self.vel[0]
+            self.check_collision_update("horizontal")
+            self.handle_outside_world_size()
+            self.change_sprite()
+            self.time_since_sprite_change += time
         self.hit -= time
 
     def __str__(self):
