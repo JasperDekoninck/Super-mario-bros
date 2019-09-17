@@ -90,12 +90,25 @@ class Mario(GameObject):
 
         self.set_sprite(sprite, size)
 
+    def collides(self, other):
+        if "tile" not in other.type:
+            if super(Mario, self).collides(other):
+                self.mask = pygame.mask.from_surface(self.image)
+                other.mask = pygame.mask.from_surface(other.image)
+                self.rect = self.image.get_rect()
+                other.rect = other.image.get_rect()
+                return pygame.sprite.spritecollide(self, [other], False, pygame.sprite.collide_mask)
+        return super(Mario, self).collides(other)
+
     def duck(self):
+        self.vel[0] *= 0.985
+        if np.abs(self.vel[0]) < 0.5:
+            self.vel[0] = 0
         if not self.ducking:
             self.ducking = True
             if self.vel[1] != 0:
                 self.vel[1] += self.ducking_speed
-        self.vel[0] = 0
+        #self.vel[0] = 0
 
     def stop_ducking(self):
         self.ducking = False
@@ -113,7 +126,8 @@ class Mario(GameObject):
             self.jumping = False
 
     def horizontal_move(self, direction=0):
-        self.vel[0] = direction * self.horizontal_speed
+        if not self.ducking:
+            self.vel[0] = direction * self.horizontal_speed
 
         if direction != 0:
             self.direction = direction

@@ -397,6 +397,7 @@ class ChangeScreen:
                         # and then load the world again (if movement happens while playing the game, this movement
                         # is reset)
                         self.world.save(os.path.join("TempWorlds", "TempWorld"))
+                        self.world.surface = None
                         self.play_screen.loop(self.world)
                         self.world.load(os.path.join("TempWorlds", "TempWorld"))
 

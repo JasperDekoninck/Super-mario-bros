@@ -42,6 +42,7 @@ class Flagpole(GameObject):
             if other.pos[1] + other.size[1] >= self.pos[1] + self.size[1] - 20:
                 other.pos[1] = self.pos[1] + self.size[1] - other.size[1] - 20
                 self.world.gameover = True
+                self.world.won = True
                 if SettingsMenu.SETTINGS["Sound"] == "on":
                     STAGE_CLEAR_SOUND.play()
             elif other.pos[1] < self.pos[1]:

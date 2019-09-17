@@ -31,12 +31,13 @@ class GameObject(pygame.sprite.Sprite):
         # The input parameters attribute is necessary for saving the world, it is advised to create this variable
         # in your game object itself
         if not hasattr(self, "input_parameters"):
-            self.input_parameters = (pos, )
+            self.input_parameters = (pos,)
 
         self.passable = passable
         self.horizontal_movable = horizontal_movable
         self.vertical_movable = vertical_movable
         self.image = sprite
+        self.rect, self.mask = None, None
 
         if resize is not None:
             self.image = pygame.transform.scale(self.image, resize)
