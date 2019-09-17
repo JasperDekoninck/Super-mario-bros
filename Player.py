@@ -28,7 +28,7 @@ class Mario(GameObject):
         self.jumping = False
 
     def collision_set_good(self, collision_object, side_index):
-        if collision_object.type != "goal":
+        if collision_object.type != "goal" and "mushroom" not in collision_object.type:
             super(Mario, self).collision_set_good(collision_object, side_index)
 
     def special_reaction_collision(self, side, other):
@@ -102,13 +102,12 @@ class Mario(GameObject):
 
     def duck(self):
         self.vel[0] *= 0.985
-        if np.abs(self.vel[0]) < 0.5:
+        if np.abs(self.vel[0]) < 5:
             self.vel[0] = 0
         if not self.ducking:
             self.ducking = True
             if self.vel[1] != 0:
                 self.vel[1] += self.ducking_speed
-        #self.vel[0] = 0
 
     def stop_ducking(self):
         self.ducking = False

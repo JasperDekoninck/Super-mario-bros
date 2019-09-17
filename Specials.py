@@ -12,7 +12,7 @@ class Mushroom(GameObject):
         self.direction = direction
         self.speed = SPEED_MUSHROOM
         super(Mushroom, self).__init__(pos, np.array([self.direction * SPEED_MUSHROOM, 0]), sprite, resize=size,
-                                       world=world, type="special")
+                                       world=world, type="mushroom special")
 
     def special_reaction_collision(self, side, other):
         if other.type == "player":

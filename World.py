@@ -178,7 +178,7 @@ class World:
         passed_time = 0
         while time > passed_time:
             # Not allowing the update to be too high, because the game would glitch if this happened
-            new_passed_time = np.minimum(0.04, time - passed_time)
+            new_passed_time = np.minimum(0.02, time - passed_time)
             self.one_update(new_passed_time)
             passed_time += new_passed_time
 
