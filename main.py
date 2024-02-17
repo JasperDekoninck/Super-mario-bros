@@ -1,11 +1,4 @@
-from Menus.MainMenu import MainMenu
-from Menus.LevelMenu import LevelMenu
-from Menus.PlayMenu import PlayMenu
-from Menus.GameOverMenu import GameOverMenu
-from Menus.LevelCreatorMenu import LevelCreatorMenu
-from Menus.AboutMenu import AboutMenu
-from Menus.SettingsMenu import SettingsMenu
-from CONSTANTS import *
+from mario import MainMenu, LevelMenu, PlayMenu, GameOverMenu, LevelCreatorMenu, AboutMenu, SettingsMenu, SCREEN_SIZE, mixer
 import pygame
 import cProfile
 
