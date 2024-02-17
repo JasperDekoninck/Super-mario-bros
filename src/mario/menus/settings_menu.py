@@ -23,7 +23,7 @@ class SettingsMenu(Menu):
         """
         Loads all options from the settings file.
         """
-        with open(os.path.join("settings"), "r") as file:
+        with open(os.path.join("settings.pkl"), "r") as file:
             for line in file.read().splitlines():
                 option_name, different_options = line.split(":")
                 different_options, selected_option = different_options.split(" | ")
@@ -44,7 +44,7 @@ class SettingsMenu(Menu):
                 self.position[1] += self.options[option_name][0].size[1] + 10
 
     def save_options(self):
-        with open(os.path.join("settings"), "w") as f:
+        with open(os.path.join("settings.pkl"), "w") as f:
             for option_name in self.options:
                 string_option = option_name + ":"
                 selected_option = None
