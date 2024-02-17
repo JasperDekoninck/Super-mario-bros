@@ -12,6 +12,17 @@ class SettingsMenu(Menu):
     }
 
     def __init__(self, screen):
+        """
+        Initializes a SettingsMenu object.
+
+        Args:
+            screen: The screen surface to render the menu on.
+
+        Attributes:
+            settings_button: A TextButton object representing the settings button.
+            options: A dictionary to store the menu options.
+            position: A list representing the position of the menu.
+        """
         super(SettingsMenu, self).__init__(screen)
         self.settings_button = TextButton((10, 10), "Settings", FONT_BIG, pygame.Color("White"))
         self.options = dict()
@@ -44,6 +55,15 @@ class SettingsMenu(Menu):
                 self.position[1] += self.options[option_name][0].size[1] + 10
 
     def save_options(self):
+        """
+        Save the selected options to a file.
+
+        This method iterates through the options and writes them to a file in the following format:
+        <option_name>: <option_message> | <selected_option>
+
+        Returns:
+            None
+        """
         with open(os.path.join("settings.pkl"), "w") as f:
             for option_name in self.options:
                 string_option = option_name + ":"
@@ -56,6 +76,9 @@ class SettingsMenu(Menu):
                 f.write(string_option)
 
     def render(self):
+        """
+        Renders the settings menu on the screen.
+        """
         self.settings_button.render(self.screen)
         self.main_button.render(self.screen)
         for option_name in self.options:
@@ -63,6 +86,19 @@ class SettingsMenu(Menu):
                 button.render(self.screen)
 
     def update_options(self):
+        """
+        Updates the options in the settings menu based on the user's selection.
+
+        This method checks the position of the mouse and updates the selected option
+        based on the button that is clicked. It also updates the corresponding setting
+        value in the SETTINGS dictionary. Finally, it saves the updated options.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
         pos = pygame.mouse.get_pos()
         for option in self.options:
             for button in self.options[option][1:]:
@@ -74,6 +110,9 @@ class SettingsMenu(Menu):
                 self.save_options()
 
     def loop(self):
+        """
+        Main loop for the settings menu.
+        """
         self.time_after_creation = 0
         while True:
             self.clock.tick(FPS)

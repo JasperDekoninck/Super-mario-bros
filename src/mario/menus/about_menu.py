@@ -7,13 +7,24 @@ class AboutMenu(Menu):
     Menu wiht some information about the game, mainly on how to create a new world.
     """
     def __init__(self, screen):
+        """
+        Initializes the AboutMenu object.
+
+        Args:
+            screen: The pygame screen surface.
+
+        Attributes:
+            phrases (list): A list of strings representing the phrases to be displayed in the menu.
+            buttons (list): A list of TextButton objects representing the buttons in the menu.
+            main_button (TextButton): The main menu button.
+        """
+        
         super().__init__(screen)
         self.phrases = [
             "This game was made by Jasper Dekoninck.",
             "You can use the code for whatever you want, no permission is required.",
             "Most sprites are copied from http://www.mariouniverse.com/sprites-ds-nsmb/.",
             "",
-            "A small guide for the creation of new levels is probably required.",
             "If you click on 'Level Creator' in main menu, you will be able to create new worlds yourself.",
             "Just follow the steps, when you're doing the actual creating, you can do the following things:",
             "1. Select a game object at the right side by pressing your left mouse button on it.",
@@ -35,11 +46,23 @@ class AboutMenu(Menu):
         self.main_button = TextButton(pos_main, "Main menu", FONT_BIG, pygame.Color("white"), pygame.Color("red"))
 
     def render(self):
+        """
+        Renders the about menu on the screen.
+        """
         for button in self.buttons:
             button.render(self.screen)
         self.main_button.render(self.screen)
 
     def loop(self):
+        """
+        Main loop for the about menu.
+
+        This method continuously updates the screen, handles events, and checks for user input.
+        It returns "main" if the main button is clicked.
+
+        Returns:
+            str: The next menu to be displayed.
+        """
         self.time_after_creation = 0
         while True:
             self.clock.tick(FPS)

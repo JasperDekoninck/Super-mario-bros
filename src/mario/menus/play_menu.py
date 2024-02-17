@@ -4,9 +4,25 @@ from .menu import Menu
 
 class PlayMenu(Menu):
     def __init__(self, screen):
+        """
+        Initializes a new instance of the PlayMenu class.
+
+        Args:
+            screen: The screen object to display the menu on.
+        """
         super(PlayMenu, self).__init__(screen)
 
     def loop(self, world, file=None):
+        """
+        Main loop for the play menu.
+
+        Args:
+            world (World): The game world.
+            file (str, optional): The file to save the top score. Defaults to None.
+
+        Returns:
+            str: The result of the loop, either "game over" or None.
+        """
         while True:
             self.clock.tick(FPS)
             for event in pygame.event.get():

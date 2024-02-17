@@ -9,6 +9,17 @@ pygame.init()
 
 class World:
     def __init__(self, size=None, background_image=None, load_file=None):
+        """
+        Initializes a World object.
+
+        Args:
+            size (tuple, optional): The size of the world. Defaults to None.
+            background_image (str, optional): The background image of the world. Defaults to None.
+            load_file (str, optional): The file to load the world from. Defaults to None.
+
+        Raises:
+            AssertionError: If both size and background_image are None, or if load_file is None.
+        """
         assert (size is not None and background_image is not None) or load_file is not None
         if size is not None:
             # creates an empty world with the given background and size
@@ -99,6 +110,15 @@ class World:
             self.player.render(screen, self.camera_pos)
 
     def allowed_game_object(self, game_object):
+        """
+        Determines whether a game object is allowed in the world.
+
+        Args:
+            game_object (GameObject): The game object to check.
+
+        Returns:
+            bool: True if the game object is allowed, False otherwise.
+        """
         if game_object.type == "tile" or game_object.passable:
             return True
         for game_object2 in self.get_all_game_objects_no_tiles():
@@ -108,7 +128,16 @@ class World:
 
     def add_gameobject(self, game_object):
         """
-        Adds a game object to the correct list of game objects
+        Adds a game object to the correct list of game objects.
+
+        Parameters:
+            game_object (GameObject): The game object to be added.
+
+        Raises:
+            ValueError: If the world already has a player.
+
+        Returns:
+            None
         """
         game_object.world = self
         if game_object.type == "player":
@@ -131,6 +160,13 @@ class World:
     def remove_gameobject(self, game_object):
         """
         Removes a game object from the correct list
+
+        Parameters:
+        game_object (GameObject): The game object to be removed
+
+        Raises:
+        ValueError: If the player object doesn't belong to the world
+
         """
         game_object.world = None
         if game_object.type == "player":
@@ -169,6 +205,15 @@ class World:
                 self.player.stop_ducking()
 
     def one_update(self, time):
+        """
+        Updates the world state for a single frame.
+
+        Args:
+            time (float): The elapsed time since the last update.
+
+        Returns:
+            None
+        """
         self.update_handle_keys()
         if self.player is not None:
             self.player.update(time)
@@ -177,6 +222,15 @@ class World:
             game_object.update(time)
 
     def update(self, time):
+        """
+        Updates the world state based on the given time.
+
+        Parameters:
+            time (float): The time elapsed since the last update.
+
+        Returns:
+            None
+        """
         passed_time = 0
         while time > passed_time:
             # Not allowing the update to be too high, because the game would glitch if this happened
@@ -199,6 +253,9 @@ class World:
     def save_top_score(self, file):
         """
         Saves the initial state of the world to the given file.
+
+        Parameters:
+        - file (str): The path to the file where the state will be saved.
         """
         self.save_list[2] = self.top_score
         pickle.dump(self.save_list, open(file, "wb"))
@@ -206,6 +263,12 @@ class World:
     def save(self, file):
         """
         Saves the world to the given file.
+
+        Parameters:
+        - file (str): The file path to save the world data.
+
+        Returns:
+        - None
         """
         save_list = [self.size, self.string_background_image, 0]
         game_objects = self.get_all_game_objects()
@@ -218,6 +281,12 @@ class World:
     def load(self, file):
         """
         Loads the world from the given file
+
+        Parameters:
+            file (str): The path to the file containing the saved world data.
+
+        Returns:
+            None
         """
         save_list = pickle.load(open(file, "rb"))
         self.save_list = save_list
@@ -232,7 +301,7 @@ class World:
         self.size = save_list[0]
 
         self.tiles_fast_access = [[None for _ in range(self.size[1] // TILE_SIZE[1] + 1)]
-                                  for _ in range(self.size[0] // TILE_SIZE[0] + 1)]
+                                    for _ in range(self.size[0] // TILE_SIZE[0] + 1)]
 
         # set background image and resizes it so it fits the screen better.
         self.background_image = BACKGROUNDS[save_list[1]]

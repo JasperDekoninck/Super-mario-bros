@@ -7,49 +7,50 @@ pygame.init()
 
 class GameObject(pygame.sprite.Sprite):
     def __init__(self, pos, vel, sprite, world=None, type=None, resize=None,
-                 passable=False, horizontal_movable=True, vertical_movable=True):
+                     passable=False, horizontal_movable=True, vertical_movable=True):
+        """
+        Initializes a game object.
+
+        Args:
+            pos (tuple): The position of the game object.
+            vel (tuple): The velocity of the game object.
+            sprite (pygame.Surface): The sprite image of the game object.
+            world (World, optional): The world in which the game object exists. Defaults to None.
+            type (str, optional): The type of the game object. Defaults to None.
+            resize (tuple, optional): The size to resize the sprite image. Defaults to None.
+            passable (bool, optional): Whether the game object is passable. Defaults to False.
+            horizontal_movable (bool, optional): Whether the game object is horizontally movable. Defaults to True.
+            vertical_movable (bool, optional): Whether the game object is vertically movable. Defaults to True.
+        """
         super(GameObject, self).__init__()
         self.world = None
-        """
-        There are different type of kinds, type can be anything but here are some types that are already used in the
-        code:
-        "player": for the player character
-        "enemy": for all enemies
-        "tile": for all tiles
-        "goal": as soon as the player hits an object of type goal, the game is won
-        "background": Background objects
-                                     
-        Any other type name will be handled as a game object that can actively collide and does move
-        
-        """
         self.type = type
         self.lives = 1
         self.alive = True
         self.pos = np.array(pos).astype(np.float64)
         self.vel = np.array(vel).astype(np.float64)
-
-        # The input parameters attribute is necessary for saving the world, it is advised to create this variable
-        # in your game object itself
         if not hasattr(self, "input_parameters"):
             self.input_parameters = (pos,)
-
         self.passable = passable
         self.horizontal_movable = horizontal_movable
         self.vertical_movable = vertical_movable
         self.image = sprite
         self.rect, self.mask = None, None
-
         if resize is not None:
             self.image = pygame.transform.scale(self.image, resize)
-
-        # the sprite with wich the game object is initialized
         self.start_sprite = self.image
         self.size = self.image.get_size()
-
         if world is not None:
             world.add_gameobject(self)
 
     def set_sprite(self, new_sprite, resize=None):
+        """
+        Set the sprite image for the game object.
+
+        Args:
+            new_sprite (pygame.Surface): The new sprite image.
+            resize (tuple, optional): The desired size of the sprite image. Defaults to None.
+        """
         self.image = new_sprite
         size = self.image.get_size()
         if resize is not None and (resize[0] != size[0] or resize[1] != size[1]):
@@ -65,6 +66,14 @@ class GameObject(pygame.sprite.Sprite):
         self.check_collision_update("vertical")
 
     def render(self, screen, pos_camera, size_screen=SCREEN_SIZE):
+        """
+        Renders the game object on the screen.
+
+        Args:
+            screen (pygame.Surface): The surface to render the game object on.
+            pos_camera (numpy.ndarray): The position of the camera.
+            size_screen (tuple, optional): The size of the screen. Defaults to SCREEN_SIZE.
+        """
         position = np.round(self.pos - pos_camera).astype(np.int32)
         if 0 <= position[0] + self.size[0] and position[0] <= size_screen[0] and \
                 0 <= position[1] + self.size[1] and position[1] <= size_screen[1]:
@@ -85,6 +94,12 @@ class GameObject(pygame.sprite.Sprite):
                     self.pos[1] + self.size[1] <= other.pos[1] or other.pos[1] + other.size[1] <= self.pos[1])
 
     def collision_tiles(self):
+        """
+        Returns the first tile that the game object collides with.
+
+        Returns:
+            The tile object that the game object collides with, or None if there is no collision.
+        """
         for i in range(int(np.floor(self.pos[0] - self.pos[0] % TILE_SIZE[0])),
                        int(np.ceil(self.pos[0] + self.size[0])), TILE_SIZE[0]):
             for j in range(int(np.floor(self.pos[1] - self.pos[1] % TILE_SIZE[1])),
@@ -99,6 +114,11 @@ class GameObject(pygame.sprite.Sprite):
         return None
 
     def collides_all(self):
+        """Checks for collisions with all game objects.
+
+        Returns:
+            list: A list of game objects that collide with the current game object.
+        """
         collisions = []
         tile = self.collision_tiles()
         if tile is not None:
@@ -143,6 +163,16 @@ class GameObject(pygame.sprite.Sprite):
                 self.pos[1] = 0
 
     def collision_set_good(self, collision_object, side_index):
+        """
+        Adjusts the position and velocity of the game object when a collision occurs with a non-passable object.
+
+        Args:
+            collision_object (GameObject): The object that the game object collided with.
+            side_index (int): The index representing the side of the collision.
+
+        Returns:
+            None
+        """
         if collision_object is not None and not collision_object.passable:
             if self.pos[side_index] < collision_object.pos[side_index]:
                 self.pos[side_index] = collision_object.pos[side_index] - self.size[side_index]

@@ -9,6 +9,15 @@ class LevelMenu(Menu):
     A menu that shows all levels.
     """
     def __init__(self, screen):
+        """
+        Initialize the LevelMenu object.
+
+        Args:
+            screen: The screen object to display the menu on.
+
+        Returns:
+            None
+        """
         super(LevelMenu, self).__init__(screen)
         self.buttons = []
         self.check_levels()
@@ -29,10 +38,16 @@ class LevelMenu(Menu):
                 y_pos = y_pos + self.buttons[-1].size[1] + 10
 
     def render(self):
+        """
+        Renders the level menu by rendering each button on the screen.
+        """
         for button in self.buttons:
             button.render(self.screen)
 
     def loop(self):
+        """
+        Main loop for the level menu.
+        """
         self.time_after_creation = 0
         self.check_levels()
         while True:

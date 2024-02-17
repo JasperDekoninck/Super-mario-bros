@@ -15,6 +15,15 @@ class QuestionScreen(Menu):
     of the user.
     """
     def __init__(self, screen, question, answer1=None, answer2=None):
+        """
+        Initializes a QuestionScreen object.
+
+        Args:
+            screen (pygame.Surface): The screen to display the question screen on.
+            question (str): The question to be displayed.
+            answer1 (str, optional): The first answer option. Defaults to None.
+            answer2 (str, optional): The second answer option. Defaults to None.
+        """
         super(QuestionScreen, self).__init__(screen)
 
         pos_question = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 3)
@@ -25,15 +34,18 @@ class QuestionScreen(Menu):
         if answer1 is not None:
             pos = (SCREEN_SIZE[0] // 2 - 130, SCREEN_SIZE[1] // 3 + 50)
             self.answer1_button = TextButton(pos, answer1, FONT_BIG, pygame.Color("white"), pygame.Color("red"),
-                                             center_pos=True)
+                                                center_pos=True)
             pos = (SCREEN_SIZE[0] // 2 + 130, SCREEN_SIZE[1] // 3 + 50)
             self.answer2_button = TextButton(pos, answer2, FONT_BIG, pygame.Color("white"), pygame.Color("red"),
-                                             center_pos=True)
+                                                center_pos=True)
         else:
             pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 3 + 50)
             self.answer_button = TextButton(pos, "", FONT_BIG, pygame.Color("white"), center_pos=True)
 
     def render(self):
+        """
+        Renders the menu on the screen.
+        """
         self.question_button.render(self.screen)
         if self.answer_button is not None:
             self.answer_button.render(self.screen)
@@ -42,6 +54,16 @@ class QuestionScreen(Menu):
             self.answer2_button.render(self.screen)
 
     def answer_update(self, event):
+        """
+        Updates the answer button message based on the given event.
+
+        Args:
+            event (pygame.event.Event): The event to process.
+
+        Returns:
+            str or None: The updated message if the event is a key press event and the Enter key is pressed,
+                         otherwise None.
+        """
         if event.type == pygame.KEYDOWN and self.answer_button is not None:
             if event.key == pygame.K_BACKSPACE:
                 if len(self.answer_button.message) > 0:
@@ -54,6 +76,12 @@ class QuestionScreen(Menu):
         return None
 
     def mouse_update(self):
+        """
+        Updates the mouse state and checks for button selection.
+
+        Returns:
+            str: The message associated with the selected button, or None if no button is selected.
+        """
         mouse_buttons = pygame.mouse.get_pressed()
         pos = pygame.mouse.get_pos()
         if self.answer1_button is not None:
@@ -68,6 +96,9 @@ class QuestionScreen(Menu):
         return None
 
     def loop(self):
+        """
+        Main loop for the menu.
+        """
         self.time_after_creation = 0
         while True:
             self.clock.tick(FPS)
@@ -96,9 +127,15 @@ class BackgroundSelectScreen(Menu):
     Selection of the background screen, asks which background the user wants and shows all possibilities
     """
     def __init__(self, screen):
+        """
+        Initializes the BackgroundSelectScreen object.
+
+        Args:
+            screen: The screen object to display the menu on.
+        """
         super(BackgroundSelectScreen, self).__init__(screen)
         self.question_button = TextButton((SCREEN_SIZE[0] // 2, 10), "What background do you want?", FONT_MEDIUM,
-                                          pygame.Color("white"), center_pos=True)
+                                            pygame.Color("white"), center_pos=True)
         self.n_backgrounds = len(BACKGROUNDS)
         self.n_backgrounds_row = 4
         self.start_first_row = 100
@@ -107,16 +144,31 @@ class BackgroundSelectScreen(Menu):
         self.background_size = 2 * (SCREEN_SIZE[0] // self.n_backgrounds_row - 3,)
         for i, background in enumerate(BACKGROUNDS):
             pos = ((self.background_size[0] + 3) * (i % self.n_backgrounds_row),
-                   (self.background_size[1] + 3) * (i // self.n_backgrounds_row) + self.start_first_row)
+                    (self.background_size[1] + 3) * (i // self.n_backgrounds_row) + self.start_first_row)
             image = pygame.transform.scale(BACKGROUNDS[background], self.background_size)
             self.background_buttons.append(ImageButton(pos, image, background))
 
     def render(self):
+        """
+        Renders the menu on the screen.
+
+        This method renders the question button and background buttons on the screen
+        using the provided screen and camera position.
+
+        Returns:
+        - None
+        """
         self.question_button.render(self.screen, self.camera_pos)
         for button in self.background_buttons:
             button.render(self.screen, self.camera_pos)
 
     def handle_mouse(self):
+        """
+        Handles mouse events in the level creator menu.
+
+        Returns:
+            str: The description of the selected button, or None if no button is selected.
+        """
         mouse_buttons = pygame.mouse.get_pressed()
         pos = pygame.mouse.get_pos() + self.camera_pos
         for button in self.background_buttons:
@@ -128,6 +180,9 @@ class BackgroundSelectScreen(Menu):
         return None
 
     def loop(self):
+        """
+        Main loop for the level creator menu.
+        """
         self.time_after_creation = 0
         while True:
             self.clock.tick(FPS)
@@ -158,9 +213,15 @@ class ChangeScreen(Menu):
     This screen is where the actual changing happens: here a user can change a world to his / her liking.
     """
     def __init__(self, screen, world=None):
+        """
+        Initializes the ChangeScreen class.
+
+        Args:
+            screen (pygame.Surface): The screen surface.
+            world (World, optional): The world object. Defaults to None.
+        """
         super(ChangeScreen, self).__init__(screen)
         self.world = world
-
         # The information menu at the right shows all possible objects the user can add.
         # There are different tabs (teh user can change tabs by clicking on arrow1 or arrow2)
         self.size_information = (400, SCREEN_SIZE[1])
@@ -269,7 +330,7 @@ class ChangeScreen(Menu):
         self.play_screen = PlayMenu(self.screen)
 
     def render_grid(self):
-        """renders the gridlines such that it easier to see for the player what he / she is doing"""
+        """Renders the gridlines on the screen to make it easier for the player to see and work with."""
         for i in range(-self.world.camera_pos[0].astype(np.int32) % TILE_SIZE[0], self.pos_information[0], TILE_SIZE[0]):
             pygame.draw.line(self.screen, pygame.Color("black"), (i, 0), (i, SCREEN_SIZE[1]))
         for j in range(-self.world.camera_pos[1].astype(np.int32) % TILE_SIZE[1], SCREEN_SIZE[1], TILE_SIZE[1]):
@@ -286,6 +347,17 @@ class ChangeScreen(Menu):
             game_object.render(self.screen, self.camera_pos)
 
     def mouse_on_button(self, pos_mouse, pos_button, size_button):
+        """
+        Check if the mouse is on a button.
+
+        Args:
+            pos_mouse (tuple): The position of the mouse (x, y).
+            pos_button (tuple): The position of the button (x, y).
+            size_button (tuple): The size of the button (width, height).
+
+        Returns:
+            bool: True if the mouse is on the button, False otherwise.
+        """
         return pos_button[0] <= pos_mouse[0] <= pos_button[0] + size_button[0] and \
                pos_button[1] <= pos_mouse[1] <= pos_button[1] + size_button[1]
 
@@ -312,6 +384,10 @@ class ChangeScreen(Menu):
             self.tab = (self.tab + 1) % len(self.tabs)
 
     def create_new_gameobject(self):
+        """
+        Creates a new game object based on the current class selection and the mouse position.
+        The game object is added to the world if it is allowed and does not collide with existing objects.
+        """
         pos = pygame.mouse.get_pos()
         if pos[0] < self.pos_information[0]:  # only allowing new creations if the mouse is in the world
             # and not on the sidebar
@@ -368,6 +444,11 @@ class ChangeScreen(Menu):
                                                   self.world.camera_pos[1] + 5)
 
     def loop(self):
+        """
+        Main loop for the level creator menu.
+        This method handles user input, updates the screen, and returns the created world when the user presses the Enter key.
+        If the user presses the Escape key, the current world is saved, then played, and finally loaded again.
+        """
         self.time_after_creation = 0
         while True:
             self.clock.tick(FPS)
@@ -400,6 +481,12 @@ class ChangeScreen(Menu):
 
 class LevelCreatorMenu(Menu):
     def __init__(self, screen):
+        """
+        Initializes the LevelCreatorMenu object.
+
+        Args:
+            screen: The screen object to display the menu on.
+        """
         super(LevelCreatorMenu, self).__init__(screen)
         self.question1 = QuestionScreen(screen, "Do you want to change a world or create one?", "Change", "Create")
         self.level_screen = LevelMenu(screen)
@@ -410,6 +497,11 @@ class LevelCreatorMenu(Menu):
         self.adaption_screen = ChangeScreen(screen)
 
     def loop(self):
+        """
+        Executes the main loop of the level creator menu.
+        Asks the user for input and performs actions based on the input.
+        Returns the next state after the loop ends.
+        """
         answer1 = self.question1.loop()
         name = None
         if answer1 == "Change":

@@ -9,6 +9,12 @@ class MainMenu(Menu):
     Main menu
     """
     def __init__(self, screen):
+        """
+        Initializes the Main Menu object.
+
+        Args:
+            screen: The screen object to display the main menu on.
+        """
         super(MainMenu, self).__init__(screen)
         # Loading the background world for the main menu
         self.background_world = World(load_file=os.path.join("Worlds", "MarioBros"))
@@ -18,9 +24,15 @@ class MainMenu(Menu):
         self.settings_button = TextButton((10, 160), "Settings", FONT_BIG, pygame.Color("white"), pygame.Color("red"))
 
     def reset(self):
+        """
+        Resets the main menu by loading the background world from the specified file.
+        """
         self.background_world = World(load_file=os.path.join("Worlds", "MarioBros"))
 
     def render(self):
+        """
+        Renders the main menu on the screen.
+        """
         self.background_world.render(self.screen)
         self.play_button.render(self.screen)
         self.level_button.render(self.screen)
@@ -28,6 +40,12 @@ class MainMenu(Menu):
         self.settings_button.render(self.screen)
 
     def loop(self):
+        """
+        Executes the main menu loop, handling user input and updating the display.
+        
+        Returns:
+            str: The next state to transition to based on user input.
+        """
         self.time_since_creation = 0
         while True:
             self.clock.tick(FPS)

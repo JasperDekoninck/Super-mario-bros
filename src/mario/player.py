@@ -7,6 +7,14 @@ from .constants import *
 
 class Mario(GameObject):
     def __init__(self, pos, size=None, world=None):
+        """
+        Initializes a Mario object.
+
+        Args:
+            pos (tuple): The position of the Mario object.
+            size (tuple, optional): The size of the Mario object. Defaults to None.
+            world (World, optional): The world in which the Mario object exists. Defaults to None.
+        """
         self.input_parameters = (pos, size)
         super(Mario, self).__init__(pos, np.zeros(2), MARIO_STILL, resize=size, type="player", world=world)
         self.horizontal_speed = SPEED_PLAYER
@@ -28,10 +36,31 @@ class Mario(GameObject):
         self.jumping = False
 
     def collision_set_good(self, collision_object, side_index):
+        """
+        Handles collision with objects that are not goals or mushrooms.
+        Calls the parent class's collision_set_good method.
+
+        Args:
+            collision_object (object): The object that Mario collides with.
+            side_index (int): The index of the side of the collision.
+
+        Returns:
+            None
+        """
         if collision_object.type != "goal" and "mushroom" not in collision_object.type:
             super(Mario, self).collision_set_good(collision_object, side_index)
 
     def special_reaction_collision(self, side, other):
+        """
+        Handles special reactions when the player collides with other objects.
+
+        Args:
+            side (str): The side of the collision ("vertical" or "horizontal").
+            other (object): The object the player collided with.
+
+        Returns:
+            None
+        """
         if other.type == "enemy" and other.alive:
             if side == "vertical" and self.pos[1] < other.pos[1] and self.ducking and \
                     (str(other) != "turtle" or other.vel[0] == 0):
@@ -58,6 +87,15 @@ class Mario(GameObject):
             self.able_to_jump = True
 
     def change_sprite(self):
+        """
+        Changes the sprite of the player character based on its current state and conditions.
+
+        The sprite is updated based on the player's movement, goal status, ducking state, and direction.
+        The size of the sprite is also adjusted based on the player's lives.
+
+        Returns:
+            None
+        """
         if self.time_since_sprite_change > TIME_SPRITE_CHANGE_PLAYER and not self.goal_reached:
             self.current_sprite_int = (self.current_sprite_int + 1) % len(MARIO_RUNNING)
             self.time_since_sprite_change = 0
@@ -91,6 +129,15 @@ class Mario(GameObject):
         self.set_sprite(sprite, size)
 
     def collides(self, other):
+        """
+        Checks for collision between the player and another object.
+
+        Parameters:
+        - other: The object to check for collision with.
+
+        Returns:
+        - A list of sprites that collide with the player, if any.
+        """
         if "tile" not in other.type:
             if super(Mario, self).collides(other):
                 self.mask = pygame.mask.from_surface(self.image)
@@ -101,6 +148,10 @@ class Mario(GameObject):
         return super(Mario, self).collides(other)
 
     def duck(self):
+        """
+        Duck method is used to make the player character duck.
+        It reduces the horizontal velocity and increases the vertical velocity if the player is already in motion.
+        """
         self.vel[0] *= 0.985
         if np.abs(self.vel[0]) < 5:
             self.vel[0] = 0
@@ -110,9 +161,20 @@ class Mario(GameObject):
                 self.vel[1] += self.ducking_speed
 
     def stop_ducking(self):
+        """
+        Stops the player from ducking.
+        """
         self.ducking = False
 
     def jump(self):
+        """
+        Makes the player character jump if able to.
+
+        If the player is able to jump and is not currently jumping, this method sets the vertical velocity
+        to a negative value to make the player character jump. It also updates the sprite and sets the
+        jumping flag to True.
+
+        """
         if self.able_to_jump and not self.jumping:
             self.able_to_jump = False
             self.vel[1] = - self.jump_speed
@@ -120,11 +182,34 @@ class Mario(GameObject):
             self.jumping = True
 
     def end_jump(self):
+        """
+        Ends the jump of the player.
+
+        If the player is currently jumping, this method sets the vertical velocity
+        to the maximum of 0 and the current vertical velocity, effectively stopping
+        the upward movement. It also sets the `jumping` attribute to False.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
         if self.jumping:
             self.vel[1] = np.maximum(0, self.vel[1])
             self.jumping = False
 
     def horizontal_move(self, direction=0):
+        """
+        Move the player horizontally.
+
+        Args:
+            direction (int): The direction of movement. 
+                -1 for left, 1 for right, and 0 for no movement.
+
+        Returns:
+            None
+        """
         if not self.ducking:
             self.vel[0] = direction * self.horizontal_speed
 
@@ -137,12 +222,24 @@ class Mario(GameObject):
         self.change_sprite()
 
     def on_death(self):
+        """
+        Handles the actions to be taken when the player dies.
+        """
         super(Mario, self).on_death()
         self.world.gameover = True
         if SettingsMenu.SETTINGS["Sound"] == "on":
             DIE_SOUND.play()
 
     def update(self, time):
+        """
+        Updates the player's position and behavior based on the given time.
+
+        Parameters:
+            time (float): The time elapsed since the last update.
+
+        Returns:
+            None
+        """
         if self.vertical_movable:
             if not self.goal_reached:
                 self.pos[1] += time * self.vel[1]
