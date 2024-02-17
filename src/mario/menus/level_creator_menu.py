@@ -356,14 +356,14 @@ class ChangeScreen(Menu):
         """
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.world.camera_pos[0] = np.maximum(0, self.world.camera_pos[0] - 5)
-        elif keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.world.camera_pos[0] = np.minimum(self.world.size[0] - self.pos_information[0],
                                                   self.world.camera_pos[0] + 5)
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.world.camera_pos[1] = np.maximum(0, self.world.camera_pos[1] - 5)
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.world.camera_pos[1] = np.minimum(self.world.size[1] - SCREEN_SIZE[1],
                                                   self.world.camera_pos[1] + 5)
 

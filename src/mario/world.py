@@ -153,17 +153,17 @@ class World:
         """
         if self.player is not None:
             keys = pygame.key.get_pressed()  # checking pressed keys
-            if keys[pygame.K_LEFT]:
+            if keys[pygame.K_LEFT] or pygame.K_a:
                 self.player.horizontal_move(direction=-1)
-            elif keys[pygame.K_RIGHT]:
+            elif keys[pygame.K_RIGHT] or pygame.K_d:
                 self.player.horizontal_move(direction=1)
             else:
                 self.player.horizontal_move(direction=0)
-            if keys[pygame.K_UP] and not self.player.jumping:
+            if (keys[pygame.K_UP] or pygame.K_w) and not self.player.jumping:
                 self.player.jump()
-            elif not keys[pygame.K_UP] and self.player.jumping:
+            elif not (keys[pygame.K_UP] or pygame.K_w) and self.player.jumping:
                 self.player.end_jump()
-            if keys[pygame.K_DOWN]:
+            if keys[pygame.K_DOWN] or pygame.K_s:
                 self.player.duck()
             else:
                 self.player.stop_ducking()
