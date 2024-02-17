@@ -1,6 +1,5 @@
 from mario import MainMenu, LevelMenu, PlayMenu, GameOverMenu, LevelCreatorMenu, AboutMenu, SettingsMenu, SCREEN_SIZE, mixer
 import pygame
-import cProfile
 
 pygame.init()
 
@@ -41,4 +40,4 @@ def main():
 
 
 if __name__ == "__main__":
-    cProfile.run("main()")
+    main()

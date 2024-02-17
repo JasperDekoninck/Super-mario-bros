@@ -86,6 +86,7 @@ class World:
                 # game on self.surface
                 self.surface = pygame.Surface(self.size)
                 self.render_tiles_and_basic(self.surface, self.size)
+
             screen.blit(
                 self.surface.subsurface((self.camera_pos[0], self.camera_pos[1], SCREEN_SIZE[0], SCREEN_SIZE[1])),
                 (0, 0))

@@ -415,8 +415,8 @@ class LevelCreatorMenu(Menu):
         if answer1 == "Change":
             _, world, name = self.level_screen.loop()
         else:
-            answer2 = int(self.question2.loop())
-            answer3 = int(self.question3.loop())
+            answer2 = max(int(self.question2.loop()), SCREEN_SIZE[0])
+            answer3 = max(int(self.question3.loop()), SCREEN_SIZE[1])
             background = self.question4.loop()
             world = World((answer2, answer3), background)
 

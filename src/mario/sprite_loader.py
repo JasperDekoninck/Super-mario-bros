@@ -213,9 +213,6 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 quit()
         pressed = pygame.mouse.get_pressed()
-        if pressed[0]:
-            print(pygame.mouse.get_pos())
-
         #screen.blit(mario, (0, 0))
         pygame.draw.rect(screen, 255, (0, 0, 60, 100))
         screen.blit(pygame.transform.scale(MARIO_STILL, (60, 100)), (0, 0))
