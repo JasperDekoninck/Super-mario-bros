@@ -1,5 +1,5 @@
 # Tetris
-This project is a simple implementation of the Tetris game using Python and Pygame. I used the TetrisFriends rules (since I like them), which specifically means you can hold blocks.
+This project is a simple implementation of the Super Mario Bros game using Python and Pygame. You can create new world and play them.
 
 ## Install
 First, install [Conda](https://docs.conda.io/projects/miniconda/en/latest/) and then run:
@@ -17,5 +17,5 @@ python main.py
 ```
 
 ## Controls
-You can control blocks using the arrow or WASD keys. Press 'c' to hold a block and space to make a black drop. After the game ends you can fill in your name and press enter to save your score in the highscores.
+You can control mario using the arrow keys or WASD. In the level creator menu, you can right click for creating an object, left click for removing it and press escape to try the level you are creating out. 
 
