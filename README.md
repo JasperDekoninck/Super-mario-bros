@@ -1,4 +1,4 @@
-# Tetris
+# Super Mario Bros
 This project is a simple implementation of the Super Mario Bros game using Python and Pygame. You can create new world and play them.
 
 ## Install
